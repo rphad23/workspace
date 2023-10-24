@@ -27,9 +27,10 @@
             background: white;
             padding: 20px;
             border-radius: 5px;
-            max-width: 400px;
+            max-width: 80%;
             /* Adjust the max width as needed */
             margin: 0 auto;
+            overflow: scroll;
         }
 
         #project-form input[type="text"],
@@ -81,6 +82,52 @@
             padding: 5px 10px;
             cursor: pointer;
         }
+
+        /* Style the modal */
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            top: 0;
+            left: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Black with opacity */
+        }
+
+        /* Style the modal content */
+        .modal-content {
+            position: relative;
+            margin: auto;
+            /* Centered */
+            width: 80%;
+            /* Could be more or less, depending on screen size */
+            height: 80%;
+            background-color: white;
+            /* White background */
+            border: 1px solid black;
+            padding: 10px;
+        }
+
+        /* Style the close button */
+        .close {
+            position: absolute;
+            /* Absolute position */
+            top: 10px;
+            /* 10px from the top */
+            right: 10px;
+            /* 10px from the right */
+            color: black;
+            /* Black color */
+            font-size: 20px;
+            /* Font size */
+            cursor: pointer;
+            /* Pointer cursor */
+        }
     </style>
 </head>
 
@@ -127,7 +174,7 @@
                 </button>
                 <button class="profile-btn">
                     <img src="https://assets.codepen.io/3306515/IMG_2025.jpg" />
-                    <span>Aybüke C.</span>
+                    <span>Profile Name (Change later)</span>
                 </button>
             </div>
             <button class="messages-btn">
@@ -261,7 +308,6 @@
                 }
 
                 // Function to update the UI with the task list
-                // Function to update the UI with the task list
                 function updateTaskList(newTask) {
                     const taskListContainer = document.getElementById('task-list-container');
 
@@ -269,15 +315,25 @@
                     const taskItem = document.createElement('div');
                     taskItem.classList.add('task-item');
                     taskItem.innerHTML = `
-            <div class="task-name">${newTask.name}</div>
-            <div class="task-status">${newTask.status}</div>
-           
-        `; 
-        // <button class="task-update-button" onclick="updateTaskStatus(this)">Update</button>
+        <div class="task-name">${newTask.name}</div>
+        <div class="task-status">${newTask.status}</div>
+    `;
 
                     // Add the task item to the task list container
                     taskListContainer.appendChild(taskItem);
                 }
+
+                // Function to add multiple tasks
+                function addMultipleTasks() {
+                    const tasks = [];
+
+                    for (const task of tasks) {
+                        updateTaskList(task);
+                    }
+                }
+
+                // Call addMultipleTasks to add multiple tasks at once
+                addMultipleTasks();
 
                 // Function to update the status of a task
                 function updateTaskStatus(buttonElement) {
@@ -356,7 +412,7 @@
                     // Create the new project HTML code with entered information
                     const newProjectCode = `
     <div class="project-box-wrapper">
-        <div class="project-box" style="background-color: #fee4cb;">
+        <div class="project-box" style="background-color: #fee4cb;" onclick="document.getElementById('modal').style.display='block'">
             <div class="project-box-header">
                 <span>${duedate}</span>
                 <div class="more-wrapper">
@@ -377,9 +433,10 @@
                 <p class="box-content-subheader">${projecttype}</p>
             </div>
             <div class="box-progress-wrapper">
-                <div class="box-progress-pill">
-                    <div class="box-progress-fill" style="width: ${percent}%; background-color: #4067f9; z-index: 30;"></div>
-                    <div class="box-progress-text">${percent}%</div>
+                <p class="box-progress-header">Progress</p>
+                <div class="box-progress-pill" >
+                    <div class="box-progress-bar" style="width: ${percent}%; background-color: #4067f9; z-index: 30;"></div>
+                    <div class="box-progress-text" style="text-align: right; margin: 0; font-size: 14px; font-weight: 700; line-height: 16px">${percent}%</div>
                 </div>
             </div>
             <div class="project-box-footer">
@@ -388,6 +445,35 @@
             </div>
         </div>
     </div>
+    
+    <div class="projects-section" style="display: none;" id="modal">
+                <div class="projects-section-header">
+                    <p>${title}</p>
+                    <p class="time">${duedate}</p>
+                </div>
+                <div class="projects-section-header">
+                    <p></p>
+                    <p class="time" style="font-size: 90%;">${daysLeft} Days Left</p>
+                </div>
+                <div class="projects-section-line">
+                    <div class="projects-status">
+                        <div class="item-status">
+                            <span class="status-number">TASKS MARKED IN PROGRESS</span>
+                            <span class="status-type">In Progress</span>
+                        </div>
+                        <div class="item-status">
+                            <span class="status-number">TASKS MARKED APPROVED</span>
+                            <span class="status-type">Completed</span>
+                        </div>
+                        <div class="item-status">
+                            <span class="status-number">TOTAL TASKS</span>
+                            <span class="status-type">Total Tasks</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tasks" id="tasklist-modal">
+                </div>
+            </div>
     `;
 
                     // Insert the new project code at the beginning of the container
@@ -430,6 +516,64 @@
                 document.getElementById('add-task-button').addEventListener('click', addTask);
 
             </script>
+            <!-- Create a modal element -->
+            <div class="modal" id="modal">
+                <div class="modal-content" id="modal-content">
+                    <span class="close" id="close">&times;</span>
+                </div>
+            </div>
 
+            <!-- Add JavaScript code -->
+            <script>
+                // Get the card element
+                var card = document.getElementById("project-card");
+
+                // Get the modal element
+                var modal = document.getElementById("modal");
+
+                // Get the modal content element
+                var modalContent = document.getElementById("modal-content");
+
+                // Get the close button element
+                var close = document.getElementById("close");
+
+                // When the user clicks on the card, open the modal and copy its content
+                card.addEventListener("click", function () {
+                    modal.style.display = "block"; // Show the modal
+                    modalContent.innerHTML = card.innerHTML; // Copy the card content
+                    modalContent.innerHTML += "<ul id='task-list'></ul>"; // Add a list element
+                    // Get the tasks from the card
+                    var tasks = card.getElementsByTagName("li");
+
+                    // Get the list element from the modal
+                    var taskList = document.getElementById("task-list");
+
+                    // Loop over the tasks and append them to the list
+                    for (var i = 0; i < tasks.length; i++) {
+                        var task = tasks[i].innerHTML; // Get the task content
+                        var listItem = document.createElement("li"); // Create a list item element
+                        listItem.innerHTML = task; // Set the list item content
+                        taskList.appendChild(listItem); // Append the list item to the list
+                    }
+
+                    modalContent.contentEditable = "true"; // Make the modal content editable
+                });
+
+                // When the user clicks on the close button, close the modal and update its content
+                close.addEventListener("click", function () {
+                    modal.style.display = "none"; // Hide the modal
+                    card.innerHTML = modalContent.innerHTML; // Update the card content
+                    modalContent.contentEditable = "false"; // Make the modal content non-editable
+                });
+
+                // When the user clicks anywhere outside of the modal, close it and update its content
+                window.addEventListener("click", function (event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none"; // Hide the modal
+                        card.innerHTML = modalContent.innerHTML; // Update the card content
+                        modalContent.contentEditable = "false"; // Make the modal content non-editable
+                    }
+                });
+            </script>
 
 </html>
