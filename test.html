@@ -411,8 +411,8 @@
 
                     // Create the new project HTML code with entered information
                     const newProjectCode = `
-    <div class="project-box-wrapper">
-        <div class="project-box" style="background-color: #fee4cb;" onclick="document.getElementById('modal').style.display='block'">
+    <div class="project-box-wrapper" id="project-card">
+        <div class="project-box" style="background-color: #fee4cb;">
             <div class="project-box-header">
                 <span>${duedate}</span>
                 <div class="more-wrapper">
@@ -445,8 +445,38 @@
             </div>
         </div>
     </div>
-    
-    <div class="projects-section" style="display: none;" id="modal">
+    `;
+
+                    // Insert the new project code at the beginning of the container
+                    const projectContainer = document.getElementById("project-container");
+                    projectContainer.insertAdjacentHTML("afterbegin", newProjectCode);
+
+                    // Hide the form dialog
+                    document.getElementById("project-form").style.display = "none";
+
+                    // Clear the form fields
+                    document.getElementById("title").value = "";
+                    document.getElementById("duedate").value = "";
+                    document.getElementById("projecttype").value = "Web Designing";
+                    document.getElementById("participants").value = "";
+                }
+
+                function createModal() {
+                    // Get the entered project details
+                    const title = document.getElementById("title").value;
+                    const duedate = document.getElementById("duedate").value;
+                    const projecttype = document.getElementById("projecttype").value;
+                    const participants = document.getElementById("participants").value;
+
+                    // Get the entered completion percentage
+                    const percent = document.getElementById("percent").value;
+
+                    // Calculate days left
+                    const daysLeft = calculateDaysLeft(duedate);
+
+                    // Create the new project HTML code with entered information
+                    const newProjectCode = `
+                    <div class="projects-section" id="openmodal">
                 <div class="projects-section-header">
                     <p>${title}</p>
                     <p class="time">${duedate}</p>
@@ -477,17 +507,9 @@
     `;
 
                     // Insert the new project code at the beginning of the container
-                    const projectContainer = document.getElementById("project-container");
+                    const projectContainer = document.getElementById("modal-content");
                     projectContainer.insertAdjacentHTML("afterbegin", newProjectCode);
 
-                    // Hide the form dialog
-                    document.getElementById("project-form").style.display = "none";
-
-                    // Clear the form fields
-                    document.getElementById("title").value = "";
-                    document.getElementById("duedate").value = "";
-                    document.getElementById("projecttype").value = "Web Designing";
-                    document.getElementById("participants").value = "";
                 }
 
                 function cancelProject() {
@@ -530,6 +552,8 @@
 
                 // Get the modal element
                 var modal = document.getElementById("modal");
+                // Get the modal element
+                var openmodal = document.getElementById("openmodal");
 
                 // Get the modal content element
                 var modalContent = document.getElementById("modal-content");
@@ -540,6 +564,8 @@
                 // When the user clicks on the card, open the modal and copy its content
                 card.addEventListener("click", function () {
                     modal.style.display = "block"; // Show the modal
+                    openmodal.style.display = "block"; // Show the modal
+                    modalContent.style.display = "block"; // Show the modal
                     modalContent.innerHTML = card.innerHTML; // Copy the card content
                     modalContent.innerHTML += "<ul id='task-list'></ul>"; // Add a list element
                     // Get the tasks from the card
