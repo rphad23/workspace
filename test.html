@@ -397,17 +397,7 @@
                 }
 
 
-                function openmodal(cardElement) {
-                    const modalID = cardElement.getAttribute('data-modal-id');
-                    const modal = document.getElementById(modalID);
-
-                    // Debugging: Log modalID to the console
-                    console.log('Modal ID:', modalID);
-
-                    // Debugging: Check if the modal element is found
-                    console.log('Modal Element:', modal);
-
-                    // Set display property
+                function openmodal(modal) {
                     modal.style.display = "block";
                 }
                 function closemodal(modal) {
@@ -428,7 +418,7 @@
 
                     // Create the new project HTML code with entered information
                     const newProjectCode = `
-                    <div class="project-box-wrapper" id="project-card" data-modal-id="modal-1" onclick="openmodal(this);">
+                    <div class="project-box-wrapper" id="project-card" onclick="openmodal(document.getElementById('modal'));">
         <div class="project-box" style="background-color: #fee4cb;">            
             <div class="project-box-header">
                 <span>${duedate}</span>
@@ -468,7 +458,6 @@
                     const projectContainer = document.getElementById("project-container");
                     projectContainer.insertAdjacentHTML("afterbegin", newProjectCode);
 
-
                     // Hide the form dialog
                     document.getElementById("project-form").style.display = "none";
 
@@ -478,8 +467,6 @@
                     document.getElementById("projecttype").value = "Web Designing";
                     document.getElementById("participants").value = "";
                 }
-
-                let modalCount = 1; // Initialize the modal count
 
                 function createModal() {
                     // Get the entered project details
@@ -494,46 +481,42 @@
                     // Calculate days left
                     const daysLeft = calculateDaysLeft(duedate);
 
-                    // Generate a unique modal ID
-                    const modalID = `modal-${modalCount}`;
-
                     // Create the new project HTML code with entered information
                     const newProjectCode = `
-        <div class="projects-section" id="${modalID}" style="display:none;">
-            <div class="projects-section-header">
-                <p>${title}</p>
-                <p class="time">${duedate}</p>
-            </div>
-            <div class="projects-section-header">
-                <p></p>
-                <p class="time" style="font-size: 90%;">${daysLeft} Days Left</p>
-            </div>
-            <div class="projects-section-line">
-                <div class="projects-status">
-                    <div class="item-status">
-                        <span class="status-number">TASKS MARKED IN PROGRESS</span>
-                        <span class="status-type">In Progress</span>
-                    </div>
-                    <div class="item-status">
-                        <span class="status-number">TASKS MARKED APPROVED</span>
-                        <span class="status-type">Completed</span>
-                    </div>
-                    <div class="item-status">
-                        <span class="status-number">TOTAL TASKS</span>
-                        <span class="status-type">Total Tasks</span>
+                    <div class="projects-section" id="openmodal">
+                <div class="projects-section-header">
+                    <p>${title}</p>
+                    <p class="time">${duedate}</p>
+                </div>
+                <div class="projects-section-header">
+                    <p></p>
+                    <p class="time" style="font-size: 90%;">${daysLeft} Days Left</p>
+                </div>
+                <div class="projects-section-line">
+                    <div class="projects-status">
+                        <div class="item-status">
+                            <span class="status-number">TASKS MARKED IN PROGRESS</span>
+                            <span class="status-type">In Progress</span>
+                        </div>
+                        <div class="item-status">
+                            <span class="status-number">TASKS MARKED APPROVED</span>
+                            <span class="status-type">Completed</span>
+                        </div>
+                        <div class="item-status">
+                            <span class="status-number">TOTAL TASKS</span>
+                            <span class="status-type">Total Tasks</span>
+                        </div>
                     </div>
                 </div>
+                <div class="tasks" id="tasklist-modal">
+                </div>
             </div>
-            <div class="tasks" id="tasklist-modal">
-            </div>
-        </div>`;
+    `;
 
                     // Insert the new project code at the beginning of the container
                     const projectContainer = document.getElementById("modal-content");
                     projectContainer.insertAdjacentHTML('afterbegin', newProjectCode);
 
-                    // Increment the modal count
-                    modalCount++;
                 }
 
                 function cancelProject() {
@@ -563,19 +546,13 @@
                 document.getElementById('add-task-button').addEventListener('click', addTask);
 
             </script>
-
-
-
-
             <!-- Create a modal element -->
             <div class="modal" id="modal">
                 <div class="modal-content" id="modal-content">
-                    <span class="close" id="close" onclick="closemodal(document.getElementById('modal'));">×</span>
+                    <span class="close" id="close"
+                    onclick="closemodal(document.getElementById('modal'));">&times;</span>
                 </div>
             </div>
-
-
-
 
             <!-- Add JavaScript code -->
             <!-- <script>
