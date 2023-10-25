@@ -407,6 +407,9 @@
                     // Debugging: Check if the modal element is found
                     console.log('Modal Element:', modal);
 
+                    const projectContainer = document.getElementById("modal-content");
+                    projectContainer.insertAdjacentHTML('afterbegin', modal);
+
                     // Set display property
                     modal.style.display = "block";
                 }
