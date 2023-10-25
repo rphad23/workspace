@@ -458,6 +458,8 @@
                     const projectContainer = document.getElementById("project-container");
                     projectContainer.insertAdjacentHTML("afterbegin", newProjectCode);
 
+                    //Call Modal
+
                     // Hide the form dialog
                     document.getElementById("project-form").style.display = "none";
 
@@ -484,38 +486,37 @@
                     // Create the new project HTML code with entered information
                     const newProjectCode = `
                     <div class="projects-section" id="openmodal">
-                <div class="projects-section-header">
-                    <p>${title}</p>
-                    <p class="time">${duedate}</p>
-                </div>
-                <div class="projects-section-header">
-                    <p></p>
-                    <p class="time" style="font-size: 90%;">${daysLeft} Days Left</p>
-                </div>
-                <div class="projects-section-line">
-                    <div class="projects-status">
-                        <div class="item-status">
-                            <span class="status-number">TASKS MARKED IN PROGRESS</span>
-                            <span class="status-type">In Progress</span>
+                        <div class="projects-section-header">
+                            <p>${title}</p>
+                            <p class="time">${duedate}</p>
                         </div>
-                        <div class="item-status">
-                            <span class="status-number">TASKS MARKED APPROVED</span>
-                            <span class="status-type">Completed</span>
+                        <div class="projects-section-header">
+                            <p></p>
+                            <p class="time" style="font-size: 90%;">${daysLeft} Days Left</p>
                         </div>
-                        <div class="item-status">
-                            <span class="status-number">TOTAL TASKS</span>
-                            <span class="status-type">Total Tasks</span>
+                        <div class="projects-section-line">
+                            <div class="projects-status">
+                                <div class="item-status">
+                                    <span class="status-number">TASKS MARKED IN PROGRESS</span>
+                                    <span class="status-type">In Progress</span>
+                                </div>
+                                <div class="item-status">
+                                    <span class="status-number">TASKS MARKED APPROVED</span>
+                                    <span class="status-type">Completed</span>
+                                </div>
+                                <div class="item-status">
+                                    <span class="status-number">TOTAL TASKS</span>
+                                    <span class="status-type">Total Tasks</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="tasks" id="tasklist-modal">
-                </div>
-            </div>
-    `;
+                        <div class="tasks" id="tasklist-modal">
+                        </div>
+                    </div>`;
 
                     // Insert the new project code at the beginning of the container
                     const projectContainer = document.getElementById("modal-content");
-                    projectContainer.insertAdjacentHTML(newProjectCode);
+                    projectContainer.insertAdjacentHTML('afterbegin', newProjectCode);
 
                 }
 
@@ -528,6 +529,7 @@
 
                 document.getElementById("addbtn").addEventListener("click", addProject);
                 document.getElementById("submit-project").addEventListener("click", submitProject);
+                document.getElementById("submit-project").addEventListener("click", createModal);
                 document.getElementById("cancel-project").addEventListener("click", cancelProject);
             </script>
             <script>
@@ -546,12 +548,12 @@
 
             </script>
             <!-- Create a modal element -->
-            <div class="modal" id="modal">
-                <div class="modal-content" id="modal-content">
-                    <span class="close" id="close"
-                    onclick="closemodal(document.getElementById('modal'));">&times;</span>
+            <div class="modal-template" style="display: none;">
+                <div class="modal-content">
+                    <span class="close-modal" onclick="closeModal(this)">&times;</span>
                 </div>
             </div>
+            
 
             <!-- Add JavaScript code -->
             <!-- <script>
