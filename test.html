@@ -111,6 +111,7 @@
             /* White background */
             border: 1px solid black;
             padding: 10px;
+            display: block;
         }
 
         /* Style the close button */
@@ -410,7 +411,7 @@
 
                 function openmodal(StringID) {
                     // Hide all modals
-                    const modals = document.querySelectorAll('.projects-section');
+                    const modals = document.querySelectorAll('.modal-section');
                     modals.forEach((modal) => {
                         modal.style.display = 'none';
                     });
@@ -480,7 +481,7 @@
     </div>
     `;
                     const newmodalCode = `
-    <div class="projects-section" id="openmodal${StringID}">
+    <div class="modal-section" id="openmodal${StringID}">
                 <div class="projects-section-header">
                     <p>${title}</p>
                     <p class="time">${duedate}</p>
