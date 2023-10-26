@@ -128,6 +128,17 @@
             cursor: pointer;
             /* Pointer cursor */
         }
+        #openmodal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background-color: #fff;
+    z-index: 9999;
+    padding: 20px;
+}
     </style>
 </head>
 
@@ -397,12 +408,24 @@
                 }
 
 
-                function openmodal(modal) {
-                    modal.style.display = "block";
+                function openmodal(StringID) {
+                    // Hide all modals
+                    const modals = document.querySelectorAll('.projects-section');
+                    modals.forEach((modal) => {
+                        modal.style.display = 'none';
+                    });
+
+                    // Show the modal corresponding to the StringID
+                    const modalToOpen = document.getElementById(`openmodal${StringID}`);
+                    if (modalToOpen) {
+                        modalToOpen.style.display = 'block';
+                    }
                 }
+
                 function closemodal(modal) {
                     modal.style.display = "none";
                 }
+
                 function submitProject() {
                     // Get the entered project details
                     const title = document.getElementById("title").value;
@@ -413,12 +436,15 @@
                     // Get the entered completion percentage
                     const percent = document.getElementById("percent").value;
 
+                    // Random StringID
+                    const StringID = Math.random().toString(36).substring(2, 5);
+
                     // Calculate days left
                     const daysLeft = calculateDaysLeft(duedate);
 
                     // Create the new project HTML code with entered information
                     const newProjectCode = `
-                    <div class="project-box-wrapper" id="project-card" onclick="openmodal(document.getElementById('modal'));">
+    <div class="project-box-wrapper" id="project-card" data-stringid="${StringID}">
         <div class="project-box" style="background-color: #fee4cb;">            
             <div class="project-box-header">
                 <span>${duedate}</span>
@@ -453,37 +479,8 @@
         </div>
     </div>
     `;
-
-                    // Insert the new project code at the beginning of the container
-                    const projectContainer = document.getElementById("project-container");
-                    projectContainer.insertAdjacentHTML("afterbegin", newProjectCode);
-
-                    // Hide the form dialog
-                    document.getElementById("project-form").style.display = "none";
-
-                    // Clear the form fields
-                    document.getElementById("title").value = "";
-                    document.getElementById("duedate").value = "";
-                    document.getElementById("projecttype").value = "Web Designing";
-                    document.getElementById("participants").value = "";
-                }
-
-                function createModal() {
-                    // Get the entered project details
-                    const title = document.getElementById("title").value;
-                    const duedate = document.getElementById("duedate").value;
-                    const projecttype = document.getElementById("projecttype").value;
-                    const participants = document.getElementById("participants").value;
-
-                    // Get the entered completion percentage
-                    const percent = document.getElementById("percent").value;
-
-                    // Calculate days left
-                    const daysLeft = calculateDaysLeft(duedate);
-
-                    // Create the new project HTML code with entered information
-                    const newProjectCode = `
-                    <div class="projects-section" id="openmodal">
+                    const newmodalCode = `
+    <div class="projects-section" id="openmodal${StringID}">
                 <div class="projects-section-header">
                     <p>${title}</p>
                     <p class="time">${duedate}</p>
@@ -514,11 +511,24 @@
     `;
 
                     // Insert the new project code at the beginning of the container
-                    const projectContainer = document.getElementById("modal-content");
-                    projectContainer.insertAdjacentHTML('afterbegin', newProjectCode);
+                    const projectContainer = document.getElementById("project-container");
+                    projectContainer.insertAdjacentHTML("afterbegin", newProjectCode);
+                    const ModalContainer = document.getElementById("modal-content");
+                    ModalContainer.insertAdjacentHTML('afterbegin', newmodalCode);
 
+                    // Add a click event listener to the newly created card to open the corresponding modal
+                    const newProjectCard = document.querySelector('[data-stringid="' + StringID + '"]');
+                    newProjectCard.addEventListener('click', () => openmodal(StringID));
+
+                    // Hide the form dialog
+                    document.getElementById("project-form").style.display = "none";
+
+                    // Clear the form fields
+                    document.getElementById("title").value = "";
+                    document.getElementById("duedate").value = "";
+                    document.getElementById("projecttype").value = "Web Designing";
+                    document.getElementById("participants").value = "";
                 }
-
                 function cancelProject() {
                     // Hide the form dialog
                     document.getElementById("project-form").style.display = "none";
@@ -528,7 +538,6 @@
 
                 document.getElementById("addbtn").addEventListener("click", addProject);
                 document.getElementById("submit-project").addEventListener("click", submitProject);
-                document.getElementById("submit-project").addEventListener("click", createModal);
                 document.getElementById("cancel-project").addEventListener("click", cancelProject);
             </script>
             <script>
@@ -550,65 +559,9 @@
             <div class="modal" id="modal">
                 <div class="modal-content" id="modal-content">
                     <span class="close" id="close"
-                    onclick="closemodal(document.getElementById('modal'));">&times;</span>
+                        onclick="closemodal(document.getElementById('modal'));">&times;</span>
                 </div>
             </div>
 
-            <!-- Add JavaScript code -->
-            <!-- <script>
-                // Get the card element
-                var card = document.getElementById("project-card");
-
-                // Get the modal element
-                var modal = document.getElementById("modal");
-                // Get the modal element
-                var openmodal = document.getElementById("openmodal");
-
-                // Get the modal content element
-                var modalContent = document.getElementById("modal-content");
-
-                // Get the close button element
-                var close = document.getElementById("close");
-
-                // When the user clicks on the card, open the modal and copy its content
-                card.addEventListener("click", function () {
-                    modal.style.display = "block"; // Show the modal
-                    openmodal.style.display = "block"; // Show the modal
-                    modalContent.style.display = "block"; // Show the modal
-                    modalContent.innerHTML = card.innerHTML; // Copy the card content
-                    modalContent.innerHTML += "<ul id='task-list'></ul>"; // Add a list element
-                    // Get the tasks from the card
-                    var tasks = card.getElementsByTagName("li");
-
-                    // Get the list element from the modal
-                    var taskList = document.getElementById("task-list");
-
-                    // Loop over the tasks and append them to the list
-                    for (var i = 0; i < tasks.length; i++) {
-                        var task = tasks[i].innerHTML; // Get the task content
-                        var listItem = document.createElement("li"); // Create a list item element
-                        listItem.innerHTML = task; // Set the list item content
-                        taskList.appendChild(listItem); // Append the list item to the list
-                    }
-
-                    modalContent.contentEditable = "true"; // Make the modal content editable
-                });
-
-                // When the user clicks on the close button, close the modal and update its content
-                close.addEventListener("click", function () {
-                    modal.style.display = "none"; // Hide the modal
-                    card.innerHTML = modalContent.innerHTML; // Update the card content
-                    modalContent.contentEditable = "false"; // Make the modal content non-editable
-                });
-
-                // When the user clicks anywhere outside of the modal, close it and update its content
-                window.addEventListener("click", function (event) {
-                    if (event.target == modal) {
-                        modal.style.display = "none"; // Hide the modal
-                        card.innerHTML = modalContent.innerHTML; // Update the card content
-                        modalContent.contentEditable = "false"; // Make the modal content non-editable
-                    }
-                });
-            </script> -->
-
+           
 </html>
