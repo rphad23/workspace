@@ -77,7 +77,7 @@
     </div>
 
     <div class="modal" id="edit-modal">
-        <div class="modal-content" id="edit-content">
+        <div class="modal-content-edit" id="edit-content">
             <h2>Edit Card</h2>
             <label for="title-edit">Title:</label>
             <input type="text" id="title-edit" required>
@@ -104,18 +104,30 @@
     <script>
         const cardsContainer = document.getElementById('cards');
         const addCardButton = document.getElementById('add-card');
+
         const cardModal = document.getElementById('card-modal');
+        const editModal = document.getElementById('edit-modal');
+
         const viewCardModal = document.getElementById('view-card-modal');
         const modalContent = document.getElementById('modal-content');
         const viewContent = document.getElementById('view-content');
+
         const saveCardButton = document.getElementById('save-card');
+        const saveChangesButton = document.getElementById('save-changes-edit');
+
         const closeCardButton = document.getElementById('close-card-modal');
+        const closeEditModal = document.getElementById('close-edit-modal');
+        const closeEdit = document.getElementById('edit-modal');
+        
         const addTaskButton = document.getElementById('add-task');
+        const addTaskButtonEdit = document.getElementById('add-task-edit');
+
         const taskList = document.getElementById('task-list');
+        const taskListEdit = document.getElementById('task-list-edit');
+
         const taskListView = document.getElementById('task-list-view');
         const editCardButton = document.getElementById('edit-card');
         const closeViewCardButton = document.getElementById('close-view-card-modal');
-        const taskListEdit = document.getElementById('task-list-edit');
         let editingCard = null;
 
         addCardButton.addEventListener('click', () => {
@@ -127,15 +139,23 @@
             saveCard();
         });
 
+        saveChangesButton.addEventListener('click', () => {
+            saveChanges();
+        });
+
         closeCardButton.addEventListener('click', () => {
             closeCardModal();
+        });
+
+        closeEditModal.addEventListener('click', () => {
+            closemodalEdit();
         });
 
         addTaskButton.addEventListener('click', () => {
             openTaskModal();
         });
 
-        addTaskButton.addEventListener('click', () => {
+        addTaskButtonEdit.addEventListener('click', () => {
             openTaskModal();
         });
 
@@ -153,23 +173,23 @@
         }
 
         function populateEditModalFields(card) {
-    const title = card.querySelector('h3').textContent;
-    const date = card.querySelector('p:nth-of-type(2)').textContent.split(': ')[1];
-    const assignee = card.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
+            const title = card.querySelector('h3').textContent;
+            const date = card.querySelector('p:nth-of-type(2)').textContent.split(': ')[1];
+            const assignee = card.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
 
-    document.getElementById('title-edit').value = title;
-    document.getElementById('date-edit').value = date;
-    document.getElementById('assignee-edit').value = assignee;
+            document.getElementById('title-edit').value = title;
+            document.getElementById('date-edit').value = date;
+            document.getElementById('assignee-edit').value = assignee;
 
-    const tasks = Array.from(card.querySelector('.task-list-card').children).map(task => task.textContent);
+            const tasks = Array.from(card.querySelector('.task-list-card').children).map(task => task.textContent);
 
-    // Clear the current task list in the edit modal
-    taskListEdit.innerHTML = '';
+            // Clear the current task list in the edit modal
+            taskListEdit.innerHTML = '';
 
-    // Populate the task list in the edit modal
-    tasks.forEach(task => {
-        const taskItem = document.createElement('div');
-        taskItem.innerHTML = `
+            // Populate the task list in the edit modal
+            tasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.innerHTML = `
             <input type="text" class="task-input" value="${task}">
             <input type="date" class="due-date" value="">
             <select class="task-status">
@@ -178,9 +198,9 @@
                 <option value="Completed">Completed</option>
             </select>
         `;
-        taskListEdit.appendChild(taskItem);
-    });
-}
+                taskListEdit.appendChild(taskItem);
+            });
+        }
 
 
 
@@ -199,6 +219,10 @@
 
         function closeCardModal() {
             cardModal.style.display = 'none';
+        }
+
+        function closemodalEdit() {
+            editModal.style.display = 'none';
         }
 
         function clearCardModalFields() {
@@ -223,7 +247,56 @@
             taskList.appendChild(taskItem);
         }
 
+        function openTaskModalEdit() {
+            // Add a new task input field in the card modal
+            const taskItem = document.createElement('div');
+            taskItem.innerHTML = `
+                <input type="text" class="task-input" placeholder="Task">
+                <input type="date" class="due-date" placeholder="Due Date">
+                <select class="task-status">
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            `;
+            taskListEdit.appendChild(taskItem);
+        }
+
         function saveCard() {
+            const title = document.getElementById('title').value;
+            const date = document.getElementById('date').value;
+            const assignee = document.getElementById('assignee').value;
+            const taskItems = Array.from(taskList.querySelectorAll('.task-input')).map(input => input.value);
+            const dueDates = Array.from(taskList.querySelectorAll('.due-date')).map(input => input.value);
+            const statuses = Array.from(taskList.querySelectorAll('.task-status')).map(select => select.value);
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <h3>${title}</h3>
+                <p>Date: ${date}</p>
+                <p>Assignee: ${assignee}</p>
+                <div class="task-list-card">
+                    <!-- Task items will be displayed here dynamically -->
+                </div>
+            `;
+            const taskListCard = card.querySelector('.task-list-card');
+
+            for (let i = 0; i < taskItems.length; i++) {
+                const taskItem = document.createElement('div');
+                taskItem.innerHTML = `
+                    <p>Task: ${taskItems[i]}</p>
+                    <p>Due Date: ${dueDates[i]}</p>
+                    <p>Status: ${statuses[i]}</p>
+                `;
+                taskListCard.appendChild(taskItem);
+            }
+
+            cardsContainer.appendChild(card);
+            closeCardModal();
+        }
+
+        function saveChanges() {
             const title = document.getElementById('title').value;
             const date = document.getElementById('date').value;
             const assignee = document.getElementById('assignee').value;
