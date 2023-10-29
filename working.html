@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        .card {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .modal-content {
+            background-color: white;
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <button id="add-card">Add Card</button>
+    <div id="cards"></div>
+    <div class="modal" id="card-modal">
+        <div class="modal-content" id="modal-content">
+            <h2>Edit Card</h2>
+            <label for="title">Title:</label>
+            <input type="text" id="title" required>
+            <br>
+            <label for="date">Date:</label>
+            <input type="date" id="date" required>
+            <br>
+            <label for="assignee">Assignee:</label>
+            <select id="assignee" required>
+                <option value="User 1">User 1</option>
+                <option value="User 2">User 2</option>
+                <option value="User 3">User 3</option>
+            </select>
+            <br>
+            <h3>Task List</h3>
+            <div id="task-list">
+                <!-- Task items will be added here dynamically -->
+            </div>
+            <button id="add-task">Add Task</button>
+            <button id="save-changes">Save Changes</button>
+            <button id="close-modal">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const cardsContainer = document.getElementById('cards');
+        const addCardButton = document.getElementById('add-card');
+        const cardModal = document.getElementById('card-modal');
+        const modalContent = document.getElementById('modal-content');
+        const saveChangesButton = document.getElementById('save-changes');
+        const closeTaskButton = document.getElementById('close-modal');
+        const addTaskButton = document.getElementById('add-task');
+        const taskList = document.getElementById('task-list');
+
+        let editingCard = null;
+
+        addCardButton.addEventListener('click', () => {
+            openModal();
+            clearModalFields();
+        });
+
+        saveChangesButton.addEventListener('click', () => {
+            saveCardChanges();
+        });
+
+        closeTaskButton.addEventListener('click', () => {
+            closeModal();
+        });
+
+        function openModal() {
+            cardModal.style.display = 'block';
+        }
+
+        function closeModal() {
+            cardModal.style.display = 'none';
+        }
+
+        function clearModalFields() {
+            document.getElementById('title').value = '';
+            document.getElementById('date').value = '';
+            document.getElementById('assignee').selectedIndex = 0;
+            taskList.innerHTML = '';
+        }
+
+        function saveCardChanges() {
+            const title = document.getElementById('title').value;
+            const date = document.getElementById('date').value;
+            const assignee = document.getElementById('assignee').value;
+
+            // Create a new card element
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<h3>${title}</h3><p>Date: ${date}</p><p>Assignee: ${assignee}</p>`;
+            cardsContainer.appendChild(card);
+
+            // Close the modal
+            closeModal();
+        }
+
+        addTaskButton.addEventListener('click', () => {
+            // Add a new task input field in the modal
+            const taskItem = document.createElement('div');
+            taskItem.innerHTML = `
+                <input type="text" class="task-input" placeholder="Task">
+                <input type="date" class="due-date" placeholder="Due Date">
+                <select class="task-status">
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            `;
+            taskList.appendChild(taskItem);
+        });
+
+        cardsContainer.addEventListener('click', (event) => {
+            const card = event.target.closest('.card');
+            if (card) {
+                editingCard = card;
+                openModal();
+                populateModalFields(editingCard);
+            }
+        });
+
+        function populateModalFields(card) {
+            const title = card.querySelector('h3').textContent;
+            const date = card.querySelector('p:nth-of-type(2)').textContent.split(': ')[1];
+            const assignee = card.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
+
+            document.getElementById('title').value = title;
+            document.getElementById('date').value = date;
+            document.getElementById('assignee').value = assignee;
+        }
+
+    </script>
+</body>
+</html>
