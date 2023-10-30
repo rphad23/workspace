@@ -113,12 +113,13 @@
         const viewContent = document.getElementById('view-content');
 
         const saveCardButton = document.getElementById('save-card');
+
         const saveChangesButton = document.getElementById('save-changes-edit');
 
         const closeCardButton = document.getElementById('close-card-modal');
         const closeEditModal = document.getElementById('close-edit-modal');
         const closeEdit = document.getElementById('edit-modal');
-        
+
         const addTaskButton = document.getElementById('add-task');
         const addTaskButtonEdit = document.getElementById('add-task-edit');
 
@@ -297,38 +298,54 @@
         }
 
         function saveChanges() {
-            const title = document.getElementById('title').value;
-            const date = document.getElementById('date').value;
-            const assignee = document.getElementById('assignee').value;
-            const taskItems = Array.from(taskList.querySelectorAll('.task-input')).map(input => input.value);
-            const dueDates = Array.from(taskList.querySelectorAll('.due-date')).map(input => input.value);
-            const statuses = Array.from(taskList.querySelectorAll('.task-status')).map(select => select.value);
+    const title = document.getElementById('title').value;
+    const date = document.getElementById('date').value;
+    const assignee = document.getElementById('assignee').value;
+    const taskItems = Array.from(taskList.querySelectorAll('.task-input')).map(input => input.value);
+    const dueDates = Array.from(taskList.querySelectorAll('.due-date')).map(input => input.value);
+    const statuses = Array.from(taskList.querySelectorAll('.task-status')).map(select => select.value);
 
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <h3>${title}</h3>
-                <p>Date: ${date}</p>
-                <p>Assignee: ${assignee}</p>
-                <div class="task-list-card">
-                    <!-- Task items will be displayed here dynamically -->
-                </div>
+    if (editingCard) {
+        // Update the card displayed in the main view
+        editingCard.querySelector('h3').textContent = title;
+        editingCard.querySelector('p:nth-of-type(2)').textContent = `Date: ${date}`;
+        editingCard.querySelector('p:nth-of-type(3)').textContent = `Assignee: ${assignee}`;
+
+        const taskListEdit = editingCard.querySelector('.task-list-edit');
+        taskListEdit.innerHTML = ''; // Clear existing task list
+
+        for (let i = 0; i < taskItems.length; i++) {
+            const taskItem = document.createElement('div');
+            taskItem.innerHTML = `
+                <p>Task: ${taskItems[i]}</p>
+                <p>Due Date: ${dueDates[i]}</p>
+                <p>Status: ${statuses[i]}</p>
             `;
-            const taskListCard = card.querySelector('.task-list-card');
-
-            for (let i = 0; i < taskItems.length; i++) {
-                const taskItem = document.createElement('div');
-                taskItem.innerHTML = `
-                    <p>Task: ${taskItems[i]}</p>
-                    <p>Due Date: ${dueDates[i]}</p>
-                    <p>Status: ${statuses[i]}</p>
-                `;
-                taskListCard.appendChild(taskItem);
-            }
-
-            cardsContainer.appendChild(card);
-            closeCardModal();
+            taskListEdit.appendChild(taskItem);
         }
+
+        // Update the details displayed in the click modal
+        document.getElementById('title-view').textContent = `Title: ${title}`;
+        document.getElementById('date-view').textContent = `Date: ${date}`;
+        document.getElementById('assignee-view').textContent = `Assignee: ${assignee}`;
+
+        const taskListView = document.getElementById('task-list-view');
+        taskListView.innerHTML = '';
+        taskItems.forEach((task, index) => {
+            const taskItem = document.createElement('div');
+            taskItem.innerHTML = `
+                <p>Task: ${task}</p>
+                <p>Due Date: ${dueDates[index]}</p>
+                <p>Status: ${statuses[index]}</p>
+            `;
+            taskListView.appendChild(taskItem);
+        });
+
+        closeEditModal(); // Close the edit modal after saving
+    }
+}
+
+
 
         function viewCardDetails(card) {
             const title = card.querySelector('h3').textContent;
