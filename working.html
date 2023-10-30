@@ -156,9 +156,33 @@
             openTaskModal();
         });
 
+        function addTaskEdit() {
+            // Get the current user, due date, and status values
+            const currentUser = document.getElementById('assignee-edit').value;
+
+            // Create a new task input field in the edit modal with the current user, due date, and status
+            const taskItem = document.createElement('div');
+            taskItem.innerHTML = `
+        <input type="text" class="task-input" placeholder="Task">
+        <input type="date" class="due-date" placeholder="Due Date">
+        <select class="task-status">
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+        </select>
+    `;
+
+            // Set the user dropdown to the current user
+            taskItem.querySelector('.task-status').value = currentUser;
+
+            taskListEdit.appendChild(taskItem);
+        }
+
+
         addTaskButtonEdit.addEventListener('click', () => {
-            openTaskModal();
+            addTaskEdit();
         });
+
 
         cardsContainer.addEventListener('click', (event) => {
             const card = event.target.closest('.card');
@@ -394,41 +418,44 @@
 
         function populateEditModalFields(card) {
             const title = card.querySelector('h3').textContent;
-            const date = card.querySelector('p:nth-of-type(2)').textContent.split(': ')[1];
             const assignee = card.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
+            const date = card.querySelector('p:nth-of-type(2)').textContent.split(': ')[1];
 
             document.getElementById('title-edit').value = title;
-            document.getElementById('date-edit').value = date;
             document.getElementById('assignee-edit').value = assignee;
+            document.getElementById('date-edit').value = date;
 
-            const tasks = Array.from(card.querySelector('.task-list-card').children).map(task => {
-                const taskText = task.textContent;
-                // Extract the "Task" text without the "Due Date" and "Status" information
-                const taskValue = taskText.split('Due Date')[0].trim();
-                // Remove "Task:" label
-                const taskWithoutLabel = taskValue.replace('Task:', '').trim();
-                return taskWithoutLabel;
-            });
+            const tasks = Array.from(card.querySelector('.task-list-card').children);
 
             // Clear the current task list in the edit modal
             taskListEdit.innerHTML = '';
 
-            // Populate the task list in the edit modal
-            tasks.forEach(taskValue => {
-                const taskItem = document.createElement('div');
-                taskItem.innerHTML = `
-            <input type="text" class="task-input" value="${taskValue}">
-            <input type="date" class="due-date" value="">
-            <select class="task-status">
-                <option value="Not Started">Not Started</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Completed">Completed</option>
-            </select>
-        `;
-                taskListEdit.appendChild(taskItem);
-            });
-        }
+            // Iterate through existing tasks
+            tasks.forEach(task => {
+                const taskInfo = task.textContent.split('\n').map(info => info.trim());
 
+                if (taskInfo.length === 3) {
+                    const taskText = taskInfo[0].replace('Task: ', '');
+                    const dueDate = taskInfo[1].replace('Due Date: ', '');
+                    const status = taskInfo[2].replace('Status: ', '');
+
+                    // Create a task item
+                    const taskItem = document.createElement('div');
+                    taskItem.innerHTML = `
+                <input type="text" class="task-input" value="${taskText}">
+                <input type="date" class="due-date" value="${dueDate}">
+                <select class="task-status">
+                    <option value="Not Started" ${status === 'Not Started' ? 'selected' : ''}>Not Started</option>
+                    <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                    <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                `;
+                    taskListEdit.appendChild(taskItem);
+                }
+            });
+
+            // Create a new task input field for adding tasks
+            openTaskModalEdit();
+        }
 
 
     </script>
