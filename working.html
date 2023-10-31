@@ -74,6 +74,35 @@
         .task-list-card {
             display: none;
         }
+
+        .notification {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            /* Initially off the screen */
+            width: 280px;
+            padding: 15px;
+            background-color: #FF5733;
+            /* Light red background */
+            color: white;
+            /* White text */
+            transition: right 0.3s ease-in-out;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 999;
+        }
+
+        .close-icon {
+            cursor: pointer;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .close-icon:hover {
+            color: black;
+            /* Change color on hover */
+        }
     </style>
 </head>
 
@@ -119,7 +148,7 @@
                 <!-- Task items will be displayed here dynamically -->
             </div>
             <button id="edit-card">Edit</button>
-           
+
         </div>
     </div>
 
@@ -145,8 +174,15 @@
             </div>
             <button id="add-task-edit">Add Task</button>
             <button id="save-changes-edit">Save Changes</button>
-            
+
         </div>
+    </div>
+
+    <!-- Fill in Field notification -->
+
+    <div id="notification" class="notification">
+        <span id="notification-text">Please fill out all required fields.</span>
+        <span id="notification-close" class="close-icon">X</span>
     </div>
 
     <script>
@@ -245,6 +281,35 @@
             editModal.style.display = 'block';
         }
 
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+
+            // Set the notification message
+            notificationText.textContent = message;
+
+            // Slide the notification in from the right
+            notification.style.right = '0';
+
+            // Automatically hide the notification after 20 seconds
+            setTimeout(function () {
+                hideNotification();
+            }, 20000); // 20 seconds
+        }
+
+        function hideNotification() {
+            const notification = document.getElementById('notification');
+
+            // Slide the notification out to the right
+            notification.style.right = '-100%';
+            notification.style.overflow = 'hidden'; // Hide completely off-screen
+        }
+
+        // Close the notification when the close button is clicked
+        document.getElementById('notification-close').addEventListener('click', hideNotification);
+
+
+    
         function populateEditModalFields(card) {
             const title = card.querySelector('h3').textContent;
             const date = card.querySelector('p:nth-of-type(2)').textContent.split(': ')[1];
@@ -342,6 +407,11 @@
             const taskItems = Array.from(taskList.querySelectorAll('.task-input')).map(input => input.value);
             const dueDates = Array.from(taskList.querySelectorAll('.due-date')).map(input => input.value);
             const statuses = Array.from(taskList.querySelectorAll('.task-status')).map(select => select.value);
+
+            if (title === '' || date === '' || assignee === '') {
+                showNotification('Please fill out all required fields.');
+                return; // Prevent card creation
+            }
 
             const card = document.createElement('div');
             card.className = 'card';
@@ -453,6 +523,11 @@
             const taskItems = Array.from(taskListEdit.querySelectorAll('.task-input')).map(input => input.value);
             const dueDates = Array.from(taskListEdit.querySelectorAll('.due-date')).map(input => input.value);
             const statuses = Array.from(taskListEdit.querySelectorAll('.task-status')).map(select => select.value);
+
+            if (title === '' || date === '' || assignee === '') {
+                showNotification('Please fill out all required fields.');
+                return; // Prevent card creation
+            }
 
             if (editingCard) {
                 editingCard.querySelector('h3').textContent = title;
