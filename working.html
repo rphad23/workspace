@@ -291,9 +291,6 @@
             populateEditModalFields(editingCard); // Populate fields in the edit modal
         }
 
-        editCardButton.addEventListener('click', () => {
-            openEditModal();
-        });
 
         function showNotification(message) {
             const notification = document.getElementById('notification');
@@ -399,6 +396,7 @@
         editCardButton.addEventListener('click', () => {
             openEditModal();
             populateEditModalFields(editingCard);
+            populateAssigneeDropdown(); // Populate assignee dropdown
         });
 
         closeViewCardButton.addEventListener('click', () => {
@@ -581,10 +579,37 @@
                 // If the date couldn't be parsed, return the original string
                 return dateString;
             }
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
+
+            const year = date.getUTCFullYear();
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(date.getUTCDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
+        }
+
+        function formatDateInPST(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) {
+                // If the date couldn't be parsed, return the original string
+                return dateString;
+            }
+            // Adjust the date to PST (Pacific Standard Time, USA)
+            date.setHours(date.getHours() - 8); // PST is UTC-8
+            return date.toLocaleDateString(undefined, options);
+        }
+
+
+        function formatDateInWordsPST(dateString) {
+            // Set the timezone to 'America/Los_Angeles' (PST)
+            const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/Los_Angeles' };
+            const date = new Date(dateString);
+
+            if (isNaN(date.getTime())) {
+                // If the date couldn't be parsed, return the original string
+                return dateString;
+            }
+
+            return date.toLocaleDateString(undefined, options);
         }
 
         function populateEditModalFields(card) {
@@ -593,8 +618,9 @@
             const originalDate = card.querySelector('.card-date').getAttribute('data-original-date');
 
             document.getElementById('title-edit').value = title;
-            document.getElementById('assignee-edit').value = assignee; // Set assignee correctly
-            document.getElementById('date-edit').value = formatDateForEdit(originalDate); // Format date for editing
+            document.getElementById('assignee-edit').value = assignee;
+            document.getElementById('date-edit').value = formatDateForEdit(originalDate);
+            document.getElementById('date-edit').textContent = formatDateInPST(originalDate);
 
             const taskListCard = card.querySelector('.task-list-card');
             const tasks = Array.from(taskListCard.children);
@@ -666,7 +692,19 @@
             }
             closemodalEdit();
         }
-        
+        function populateAssigneeDropdown() {
+            // Populate the assignee dropdown in the edit modal
+            const assigneeEditDropdown = document.getElementById('assignee-edit');
+            assigneeEditDropdown.innerHTML = '';
+            const assigneeOptions = document.getElementById('assignee').options;
+            for (let i = 0; i < assigneeOptions.length; i++) {
+                const option = document.createElement('option');
+                option.value = assigneeOptions[i].value;
+                option.text = assigneeOptions[i].text;
+                assigneeEditDropdown.appendChild(option);
+            }
+        }
+
         function updateViewCardModal(title, editedDate, assignee, taskItems) {
             const dateView = document.getElementById('date-view');
             dateView.textContent = `Date: ${formatDateInWords(editedDate)}`;
