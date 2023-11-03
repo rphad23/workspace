@@ -322,7 +322,41 @@
         // Close the notification when the close button is clicked
         document.getElementById('notification-close').addEventListener('click', hideNotification);
 
+        function populateCardFields(card) {
+            const title = card.querySelector('h3').textContent;
+            const assignee = card.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
+            const originalDate = card.querySelector('.card-date').getAttribute('data-original-date');
 
+            document.getElementById('title-edit').value = title;
+            document.getElementById('assignee-edit').value = assignee;
+
+            // Set the date in the edit modal
+            document.getElementById('date-edit').value = formatDateForEdit(originalDate);
+
+            const taskListCard = card.querySelector('.task-list-card');
+            const tasks = Array.from(taskListCard.children);
+
+            // Clear the current task list in the edit modal
+            taskListEdit.innerHTML = '';
+
+            // Populate the task list in the edit modal
+            tasks.forEach(task => {
+                const taskText = task.querySelector('p:nth-of-type(1)').textContent.split(': ')[1];
+                const dueDate = task.querySelector('p:nth-of-type(2)').textContent.split(': ')[1];
+                const status = task.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
+
+                const taskItem = document.createElement('div');
+                taskItem.innerHTML = `
+                <input type="text" class="task-input" value="${taskText}">
+                <input type="date" class="due-date" value="${originalDate}"> <!-- Use the edit format -->
+                <select class="task-status">
+                    <option value="Not Started" ${status === 'Not Started' ? 'selected' : ''}>Not Started</option>
+                    <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                    <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                `;
+                taskListEdit.appendChild(taskItem);
+            });
+        }
 
         function populateEditModalFields(card) {
             const title = card.querySelector('h3').textContent;
@@ -421,8 +455,13 @@
         }
 
         function formatDateForDisplay(dateString) {
-            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-            return new Date(dateString).toLocaleDateString(undefined, options);
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) {
+                return dateString;
+            }
+
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString(undefined, options);
         }
 
         function formatDateInWords(dateString) {
@@ -488,13 +527,10 @@
             const dateElement = card.querySelector('.card-date');
             const assignee = card.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
             const date = dateElement.getAttribute('data-original-date'); // Get the original format
-            editingCard = card; // Set the editingCard
 
-            // Populate the fields in the view modal
             document.getElementById('title-view').textContent = `Title: ${title}`;
             document.getElementById('date-view').textContent = `Date: ${formatDateInWords(date)}`;
             document.getElementById('assignee-view').textContent = `Assignee: ${assignee}`;
-
             const taskListView = document.getElementById('task-list-view');
             taskListView.innerHTML = '';
 
@@ -503,6 +539,11 @@
                 taskListView.appendChild(taskItem.cloneNode(true));
             }
 
+            // Open the view card modal
+            openViewCardModal();
+        }
+
+        function openViewCardModal() {
             viewCardModal.style.display = 'block';
         }
 
@@ -580,8 +621,8 @@
 
         function saveChanges() {
             const title = document.getElementById('title-edit').value;
-            const assignee = document.getElementById('assignee-edit').value; // Get assignee
             const dateInput = document.getElementById('date-edit');
+            const assignee = document.getElementById('assignee-edit').value;
             const taskItems = Array.from(taskListEdit.querySelectorAll('.task-input')).map(input => input.value);
             const dueDates = Array.from(taskListEdit.querySelectorAll('.due-date')).map(input => input.value);
             const statuses = Array.from(taskListEdit.querySelectorAll('.task-status')).map(select => select.value);
@@ -591,24 +632,25 @@
                 return;
             }
 
-            const originalDate = dateInput.getAttribute('data-original-date');
+            // Use the edit format for saving changes
+            const editedDate = dateInput.value;
 
             if (editingCard) {
                 editingCard.querySelector('h3').textContent = title;
                 const dateElement = editingCard.querySelector('.card-date');
-                dateElement.textContent = `Date: ${formatDateInWords(originalDate)}`; // Update date
-                dateElement.setAttribute('data-original-date', originalDate);
-                editingCard.querySelector('p:nth-of-type(3)').textContent = `Assignee: ${assignee}`; // Update assignee
+                dateElement.textContent = `Date: ${formatDateInWords(editedDate)}`;
+                dateElement.setAttribute('data-original-date', editedDate);
+                editingCard.querySelector('p:nth-of-type(3)').textContent = `Assignee: ${assignee}`;
 
                 const taskListCard = editingCard.querySelector('.task-list-card');
                 const existingTasks = Array.from(taskListCard.children);
 
                 for (let i = 0; i < taskItems.length; i++) {
                     const taskItem = existingTasks[i] || document.createElement('div');
-                    const formattedDueDate = formatDateInWords(dueDates[i]);
+                    const formattedDueDate = formatDateForEdit(dueDates[i]);
                     taskItem.innerHTML = `
                     <p>Task: ${taskItems[i]}</p>
-                    <p>Due Date: ${formattedDueDate}</p>
+                    <p>Due Date: ${formatDateInWords(formattedDueDate)}</p>
                     <p>Status: ${statuses[i]}</p>
                 `;
 
@@ -618,11 +660,29 @@
                         taskListCard.appendChild(taskItem);
                     }
                 }
-            }
 
-            // Close the edit modal
+                // Update the view card modal immediately
+                updateViewCardModal(title, editedDate, assignee, taskListCard.children);
+            }
             closemodalEdit();
         }
+        
+        function updateViewCardModal(title, editedDate, assignee, taskItems) {
+            const dateView = document.getElementById('date-view');
+            dateView.textContent = `Date: ${formatDateInWords(editedDate)}`;
+
+            const assigneeView = document.getElementById('assignee-view');
+            assigneeView.textContent = `Assignee: ${assignee}`;
+
+            const taskListView = document.getElementById('task-list-view');
+            taskListView.innerHTML = '';
+
+            for (const taskItem of taskItems) {
+                taskListView.appendChild(taskItem.cloneNode(true));
+            }
+        }
+
+
     </script>
 </body>
 
