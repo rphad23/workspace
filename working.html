@@ -113,6 +113,15 @@
         .card-date {
             text-align: center;
         }
+
+        .delete-task-edit {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
     </style>
 </head>
 
@@ -246,16 +255,11 @@
             closemodalEdit();
         });
 
+        // Create Card Modal
         addTaskButton.addEventListener('click', () => {
-            openTaskModal();
-        });
-
-        function addTaskEdit() {
-            // Get the current user, due date, and status values
-            const currentUser = document.getElementById('assignee-edit').value;
-
-            // Create a new task input field in the edit modal with the current user, due date, and status
+            // Add a new task input field in the card modal
             const taskItem = document.createElement('div');
+            taskItem.classList.add('task-item'); // Add a class to identify task items
             taskItem.innerHTML = `
         <input type="text" class="task-input" placeholder="Task">
         <input type="date" class="due-date" placeholder="Due Date">
@@ -264,13 +268,46 @@
             <option value="In Progress">In Progress</option>
             <option value="Completed">Completed</option>
         </select>
+        <button class="delete-task">Delete</button>
     `;
+            taskList.appendChild(taskItem);
 
-            // Set the user dropdown to the current user
-            taskItem.querySelector('.task-status').value = currentUser;
+            // Attach a click event listener to the "Delete" button for this task
+            const deleteTaskButton = taskItem.querySelector('.delete-task');
+            deleteTaskButton.addEventListener('click', () => {
+                taskList.removeChild(taskItem); // Remove the task when the "Delete" button is clicked
+            });
+        });
 
+
+        function addTaskEdit() {
+            const currentUser = document.getElementById('assignee-edit').value;
+
+            const taskItem = document.createElement('div');
+            taskItem.classList.add('task-item'); // Add a class to the task item
+            taskItem.innerHTML = `
+        <input type="text" class="task-input" placeholder="Task">
+        <input type="date" class="due-date" placeholder="Due Date">
+        <select class="task-status">
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+        `;
             taskListEdit.appendChild(taskItem);
+
+            // Create a "Delete" button
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-task'); // Add a class to the delete button
+            taskItem.appendChild(deleteButton);
+
+            // Add an event listener to the "Delete" button to remove the task
+            deleteButton.addEventListener('click', () => {
+                taskListEdit.removeChild(taskItem);
+            });
         }
+
+
 
 
         addTaskButtonEdit.addEventListener('click', () => {
@@ -287,9 +324,57 @@
         });
 
         function openEditModal() {
-            editModal.style.display = 'block';
-            populateEditModalFields(editingCard); // Populate fields in the edit modal
-        }
+    editModal.style.display = 'block';
+    populateEditModalFields(editingCard); // Populate fields in the edit modal
+    const taskListCard = editingCard.querySelector('.task-list-card');
+    const tasks = Array.from(taskListCard.children);
+
+    taskListEdit.innerHTML = '';
+
+    tasks.forEach(task => {
+        const taskText = task.querySelector('p:nth-of-type(1)').textContent.split(': ')[1];
+        const dueDate = task.querySelector('p:nth-of-type(2)').textContent.split(': ')[1];
+        const status = task.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
+
+        // Create a task item container
+        const taskItem = document.createElement('div');
+        taskItem.classList.add('task-item-edit');
+        taskItem.innerHTML = `
+            <input type="text" class="task-input" value="${taskText}">
+            <input type="date" class="due-date" value="${formatDateForEdit(dueDate)}">
+            <select class="task-status">
+                <option value="Not Started" ${status === 'Not Started' ? 'selected' : ''}>Not Started</option>
+                <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+        `;
+
+        // Create a "Delete" button for each task
+        const deleteTaskButtonEdit = document.createElement('button');
+        deleteTaskButtonEdit.textContent = 'Delete';
+        deleteTaskButtonEdit.classList.add('delete-task-edit');
+
+        // Add an event listener to delete the task when the "Delete" button is clicked
+        deleteTaskButtonEdit.addEventListener('click', () => {
+            taskListEdit.removeChild(taskContainerEdit);
+        });
+
+        // Create a container for the task and the "Delete" button
+        const taskContainerEdit = document.createElement('div');
+        taskContainerEdit.classList.add('task-container-edit');
+        taskContainerEdit.appendChild(taskItem);
+        taskContainerEdit.appendChild(deleteTaskButtonEdit);
+
+        taskListEdit.appendChild(taskContainerEdit);
+    });
+
+    // Add CSS styling to the "Delete" buttons
+    const deleteTaskButtons = document.querySelectorAll('.delete-task-edit');
+    deleteTaskButtons.forEach(button => {
+        button.style.display = 'block';
+        button.style.marginTop = '10px';
+    });
+}
+
 
 
         function showNotification(message) {
@@ -305,7 +390,7 @@
             // Automatically hide the notification after 20 seconds
             setTimeout(function () {
                 hideNotification();
-            }, 20000); // 20 seconds
+            }, 10000); // 20 seconds
         }
 
         function hideNotification() {
