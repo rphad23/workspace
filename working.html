@@ -114,6 +114,16 @@
             text-align: center;
         }
 
+        .delete-task {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            border-radius: 10px;
+        }
+
         .delete-task-edit {
             background-color: red;
             color: white;
@@ -121,6 +131,7 @@
             border-radius: 5px;
             cursor: pointer;
             margin-left: 10px;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -292,19 +303,17 @@
             <option value="Not Started">Not Started</option>
             <option value="In Progress">In Progress</option>
             <option value="Completed">Completed</option>
+        </select>
+        <button class="delete-task">Delete</button>
         `;
             taskListEdit.appendChild(taskItem);
-
-            // Create a "Delete" button
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.classList.add('delete-task'); // Add a class to the delete button
-            taskItem.appendChild(deleteButton);
-
-            // Add an event listener to the "Delete" button to remove the task
-            deleteButton.addEventListener('click', () => {
-                taskListEdit.removeChild(taskItem);
+            // Attach a click event listener to the "Delete" button for this task
+            const deleteTaskButton = taskItem.querySelector('.delete-task');
+            deleteTaskButton.addEventListener('click', () => {
+                taskList.removeChild(taskItem); // Remove the task when the "Delete" button is clicked
             });
+
+
         }
 
 
@@ -324,56 +333,32 @@
         });
 
         function openEditModal() {
-    editModal.style.display = 'block';
-    populateEditModalFields(editingCard); // Populate fields in the edit modal
-    const taskListCard = editingCard.querySelector('.task-list-card');
-    const tasks = Array.from(taskListCard.children);
+            editModal.style.display = 'block';
+            populateEditModalFields(editingCard); // Populate fields in the edit modal
+            const taskListCard = editingCard.querySelector('.task-list-card');
+            const tasks = Array.from(taskListCard.children);
 
-    taskListEdit.innerHTML = '';
+            taskListEdit.innerHTML = '';
 
-    tasks.forEach(task => {
-        const taskText = task.querySelector('p:nth-of-type(1)').textContent.split(': ')[1];
-        const dueDate = task.querySelector('p:nth-of-type(2)').textContent.split(': ')[1];
-        const status = task.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
+            tasks.forEach(task => {
+                const taskText = task.querySelector('p:nth-of-type(1)').textContent.split(': ')[1];
+                const dueDate = task.querySelector('p:nth-of-type(2)').textContent.split(': ')[1];
+                const status = task.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
 
-        // Create a task item container
-        const taskItem = document.createElement('div');
-        taskItem.classList.add('task-item-edit');
-        taskItem.innerHTML = `
+                // Create a task item container
+                const taskItem = document.createElement('div');
+                taskItem.classList.add('task-item-edit');
+                taskItem.innerHTML = `
             <input type="text" class="task-input" value="${taskText}">
             <input type="date" class="due-date" value="${formatDateForEdit(dueDate)}">
             <select class="task-status">
                 <option value="Not Started" ${status === 'Not Started' ? 'selected' : ''}>Not Started</option>
                 <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
                 <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
-        `;
-
-        // Create a "Delete" button for each task
-        const deleteTaskButtonEdit = document.createElement('button');
-        deleteTaskButtonEdit.textContent = 'Delete';
-        deleteTaskButtonEdit.classList.add('delete-task-edit');
-
-        // Add an event listener to delete the task when the "Delete" button is clicked
-        deleteTaskButtonEdit.addEventListener('click', () => {
-            taskListEdit.removeChild(taskContainerEdit);
-        });
-
-        // Create a container for the task and the "Delete" button
-        const taskContainerEdit = document.createElement('div');
-        taskContainerEdit.classList.add('task-container-edit');
-        taskContainerEdit.appendChild(taskItem);
-        taskContainerEdit.appendChild(deleteTaskButtonEdit);
-
-        taskListEdit.appendChild(taskContainerEdit);
-    });
-
-    // Add CSS styling to the "Delete" buttons
-    const deleteTaskButtons = document.querySelectorAll('.delete-task-edit');
-    deleteTaskButtons.forEach(button => {
-        button.style.display = 'block';
-        button.style.marginTop = '10px';
-    });
-}
+                </select>
+            `;
+            });
+        }
 
 
 
@@ -435,6 +420,7 @@
                     <option value="Not Started" ${status === 'Not Started' ? 'selected' : ''}>Not Started</option>
                     <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
                     <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                    </select>                    
                 `;
                 taskListEdit.appendChild(taskItem);
             });
@@ -470,6 +456,7 @@
                     <option value="Not Started" ${status === 'Not Started' ? 'selected' : ''}>Not Started</option>
                     <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
                     <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                    </select>
                 `;
                 taskListEdit.appendChild(taskItem);
             });
@@ -533,6 +520,7 @@
                     <option value="In Progress">In Progress</option>
                     <option value="Completed">Completed</option>
                 </select>
+                
             `;
             taskListEdit.appendChild(taskItem);
         }
@@ -570,6 +558,13 @@
             if (title === '' || dateInput.value === '' || assignee === '') {
                 showNotification('Please fill out all required fields');
                 return; // Prevent card creation
+            }
+            // Check if there is at least one task
+            const hasMinimumTask = taskItems.some(task => task.trim() !== '');
+
+            if (title === '' || dateInput.value === '' || assignee === '' || !hasMinimumTask) {
+                showNotification('Please fill out all required fields and add at least one task.');
+                return;
             }
 
             // Use the original format 'yyyy-MM-dd' for saving
@@ -725,9 +720,18 @@
                     <option value="Not Started" ${status === 'Not Started' ? 'selected' : ''}>Not Started</option>
                     <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
                     <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                    </select>
+                    <button class="delete-task-edit" >Delete test</button>
                 `;
                 taskListEdit.appendChild(taskItem);
+                // Attach a click event listener to the "Delete" button for this task
+                const deleteTaskButton = taskItem.querySelector('.delete-task-edit');
+                deleteTaskButton.addEventListener('click', () => {
+                    taskListEdit.removeChild(taskItem); // Remove the task from the correct list
+                });
+
             });
+
         }
 
         function saveChanges() {
@@ -740,6 +744,13 @@
 
             if (title === '' || dateInput.value === '' || assignee === '') {
                 showNotification('Please fill out all required fields.');
+                return;
+            }
+            // Check if there is at least one task
+            const hasMinimumTask = taskItems.some(task => task.trim() !== '');
+
+            if (title === '' || dateInput.value === '' || assignee === '' || !hasMinimumTask) {
+                showNotification('Please fill out all required fields and add at least one task.');
                 return;
             }
 
@@ -755,15 +766,16 @@
 
                 const taskListCard = editingCard.querySelector('.task-list-card');
                 const existingTasks = Array.from(taskListCard.children);
+                const deletedTasks = new Set();
 
                 for (let i = 0; i < taskItems.length; i++) {
                     const taskItem = existingTasks[i] || document.createElement('div');
                     const formattedDueDate = formatDateForEdit(dueDates[i]);
                     taskItem.innerHTML = `
-                    <p>Task: ${taskItems[i]}</p>
-                    <p>Due Date: ${formatDateInWords(formattedDueDate)}</p>
-                    <p>Status: ${statuses[i]}</p>
-                `;
+                <p>Task: ${taskItems[i]}</p>
+                <p>Due Date: ${formatDateInWords(formattedDueDate)}</p>
+                <p>Status: ${statuses[i]}</p>
+            `;
 
                     if (existingTasks[i]) {
                         existingTasks[i].innerHTML = taskItem.innerHTML;
@@ -772,11 +784,26 @@
                     }
                 }
 
+                // Collect deleted tasks
+                for (let i = taskItems.length; i < existingTasks.length; i++) {
+                    deletedTasks.add(existingTasks[i]);
+                }
+
+                // Remove deleted tasks from the view card modal
+                const viewTaskListCard = viewCardModal.querySelector('.task-list-card');
+                for (const deletedTask of deletedTasks) {
+                    viewTaskListCard.removeChild(deletedTask);
+                }
+
                 // Update the view card modal immediately
                 updateViewCardModal(title, editedDate, assignee, taskListCard.children);
             }
             closemodalEdit();
         }
+
+
+
+
         function populateAssigneeDropdown() {
             // Populate the assignee dropdown in the edit modal
             const assigneeEditDropdown = document.getElementById('assignee-edit');
