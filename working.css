@@ -10,7 +10,8 @@ body {
     font-family: 'DM Sans', sans-serif;
     overflow: hidden;
     justify-content: center;
-    background-color: #1f1d2b;;
+    background-color: #1f1d2b;
+    ;
 }
 
 button,
@@ -71,17 +72,15 @@ a {
 }
 
 #edit-modal {
-    background-color: white;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 40%;
-    width: 80%;
-    max-width: 600px;
-    margin-left: 30%;
-    padding: 20px;
+    float: right;
+    border-radius: 50%;
+    cursor: pointer;
     border-radius: 10px;
-    align-content: center;
+    background-color: white;
+    width: 40%;
+    height: 40%;
+    padding: 20px;
+    margin-top: auto;
 }
 
 .task-list-card {
@@ -123,4 +122,49 @@ a {
 
 .card-date {
     text-align: center;
+}
+
+.delete-task {
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    border-radius: 10px;
+}
+
+.delete-task-edit {
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    border-radius: 10px;
+}
+
+/* Add your CSS styles here if needed */
+.collapsible {
+    background-color: #777;
+    color: white;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+}
+
+.collapsible.active,
+.collapsible:hover {
+    background-color: #555;
+}
+
+.content {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
 }
