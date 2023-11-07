@@ -35,6 +35,7 @@
             margin: 20px auto;
             padding: 20px;
             border-radius: 30px;
+            height: 100%;
         }
 
         #add-card {
@@ -64,7 +65,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            height: 40%;
+            height: 100%;
             width: 80%;
             max-width: 600px;
             margin-left: 30%;
@@ -132,6 +133,31 @@
             cursor: pointer;
             margin-left: 10px;
             border-radius: 10px;
+        }
+
+        /* Add your CSS styles here if needed */
+        .collapsible {
+            background-color: #777;
+            color: white;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .collapsible.active,
+        .collapsible:hover {
+            background-color: #555;
+        }
+
+        .content {
+            padding: 0 18px;
+            display: none;
+            overflow: hidden;
+            background-color: #f1f1f1;
         }
     </style>
 </head>
@@ -588,10 +614,14 @@
 
             for (let i = 0; i < taskItems.length; i++) {
                 const taskItem = document.createElement('div');
+                const formattedDueDate = formatDateForEdit(dueDates[i]);
                 taskItem.innerHTML = `
-            <p>Task: ${taskItems[i]}</p>
-            <p>Due Date: ${formatDateInWords(dueDates[i])}</p>
-            <p>Status: ${statuses[i]}</p>
+                <button class="collapsible">${taskItems[i]}</button>
+                    <div class="content">
+                        <p>Task: ${taskItems[i]}</p>
+                        <p>Due Date: ${formatDateInWords(formattedDueDate)}</p>
+                        <p>Status: ${statuses[i]}</p>
+                    </div>
         `;
                 taskListCard.appendChild(taskItem);
             }
@@ -772,9 +802,12 @@
                     const taskItem = existingTasks[i] || document.createElement('div');
                     const formattedDueDate = formatDateForEdit(dueDates[i]);
                     taskItem.innerHTML = `
-                <p>Task: ${taskItems[i]}</p>
-                <p>Due Date: ${formatDateInWords(formattedDueDate)}</p>
-                <p>Status: ${statuses[i]}</p>
+                    <button class="collapsible">${taskItems[i]}</button>
+                    <div class="content">
+                        <p>Task: ${taskItems[i]}</p>
+                        <p>Due Date: ${formatDateInWords(formattedDueDate)}</p>
+                        <p>Status: ${statuses[i]}</p>
+                    </div>
             `;
 
                     if (existingTasks[i]) {
@@ -834,6 +867,27 @@
 
 
     </script>
+    <!-- FOR collapsible -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.body.addEventListener("click", function (event) {
+                if (event.target.classList.contains("collapsible")) {
+                    console.log("Button clicked");
+                    event.target.classList.toggle("active");
+                    var content = event.target.nextElementSibling;
+                    if (content.style.display === "block") {
+                        content.style.display = "none";
+                    } else {
+                        content.style.display = "block";
+                    }
+                }
+            });
+        });
+
+
+
+    </script>
+
 </body>
 
 </html>
