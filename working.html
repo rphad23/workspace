@@ -5,15 +5,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Manager</title>    
+    <title>Task Manager</title>
     <link rel="stylesheet" href="working.css">
 
 </head>
 
 <body>
-    <button id="add-card">+</button>
+    <div class="add-button"><button id="add-card">+</button></div>
+
     <br>
-    <div id="cards"></div>
+    <div class="card-list">
+        <div id="cards"></div>
+    </div>
+
     <div class="modal" id="card-modal">
         <div class="modal-content" id="modal-content">
             <button id="close-card-modal">&times;</button>
@@ -86,10 +90,10 @@
 
     <div id="notification" class="notification">
         <span id="notification-close" class="close-icon">X</span>
-        <span id="notification-text">Please fill out all required fields.</span>        
+        <span id="notification-text">Please fill out all required fields.</span>
     </div>
 
-   <script src="script.js"></script>
+    <script src="script.js"></script>
 
 </body>
 

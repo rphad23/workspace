@@ -10,7 +10,7 @@ body {
     font-family: 'DM Sans', sans-serif;
     overflow: hidden;
     justify-content: center;
-    background-color: #1f1d2b;
+    background-color: rgb(17, 24, 39);
     ;
 }
 
@@ -19,6 +19,40 @@ a {
     cursor: pointer;
 }
 
+.card-list {
+    background-color: rgb(31, 41, 55);
+    border-radius: 30px;
+    width: 90%;
+    height: 90%;
+    float: right;
+    overflow-y: auto; 
+    max-height: 100%;
+    scroll-behavior: smooth;
+
+}
+.card-list::-webkit-scrollbar {
+    width: 5px; /* Width of the scrollbar */
+}
+
+.card-list::-webkit-scrollbar-track {
+    background: rgb(17, 24, 39, 0); /* Track color */
+}
+
+.card-list::-webkit-scrollbar-thumb {
+    background: rgb(31, 41, 55); /* Thumb color */
+    border-radius: 30px; /* Rounded corners of the thumb */
+}
+
+.card-list::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Thumb color on hover */
+}
+
+#cards {
+    display: grid;
+    column-gap: 10px;
+    grid-template-columns: auto auto;
+    width: 90%;
+}
 
 .card {
     margin: 10px;
@@ -26,7 +60,7 @@ a {
     border-radius: 30px;
     padding: 16px;
     background-color: var(--main-color-card);
-    width: 400px;
+    width: auto;
     background-color: #ffd3e2;
 }
 
@@ -49,25 +83,27 @@ a {
     border-radius: 30px;
 }
 
+.add-button {
+    padding-right: 2%;
+}
+
 #add-card {
     float: right;
-    border-radius: 50%;
     cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
 }
 
-#close-card-modal {
-    float: right;
-}
-
-#close-view-card-modal {
-    float: right;
-}
-
+#close-card-modal,
+#close-view-card-modal,
 #close-edit-modal {
     float: right;
 }
 
-#close-card-modal:hover {
+#close-card-modal:hover,
+#close-view-card-modal:hover,
+#close-edit-modal:hover {
     background-color: blue;
 }
 
